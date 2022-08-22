@@ -36,6 +36,10 @@ class PaymentTypeSelector
             return $result;
 
         foreach ($payMethodList as $data) {
+
+            if($this->checkProductType($data['payment_name']) === false)
+                continue;
+
             $checkCountry = $this->checkCountry(json_decode($data['country_list']), empty($data['not_in_list']) ? false : true);
             if($checkCountry === false)
                 continue;
@@ -46,8 +50,6 @@ class PaymentTypeSelector
             if($this->checkAmount($data['payment_name']) === false)
                 continue;
 
-            if($this->checkProductType($data['payment_name']) === false)
-                continue;
 
             $result[] = [
                 'name' => $data['method_name'],
