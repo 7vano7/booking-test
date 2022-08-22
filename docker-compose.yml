@@ -1,0 +1,50 @@
+version: '3.9'
+
+services:
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - .:/var/www/test
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - php
+
+  php:
+    build: ./docker/web
+    container_name: php
+    working_dir: /var/www/test
+    volumes:
+      - .:/var/www/test
+    links:
+      - db_test
+
+  db_test:
+    image: mysql
+    container_name: db_test
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: =!test2022@!=
+      MYSQL_USER: my_test
+      MYSQL_PASSWORD: mysql_test
+    volumes:
+      - ./docker/db:/var/lib/mysql
+    hostname: test.db
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8081:80
+    environment:
+      PMA_HOST: test.db
+    depends_on:
+      - db_test
+
+
